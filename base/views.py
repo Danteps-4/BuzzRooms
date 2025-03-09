@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.db.models import Q
 from .models import Room, Topic, Message, Profile
-from .forms import RoomForm, ProfileForm
+from .forms import RoomForm, ProfileForm, TopicForm
 
 
 # Create your views here.
@@ -115,18 +115,26 @@ def update_user(request):
         return render(request, "base/update_user.html", context)
 
 @login_required
-def create_room(request):
-    form = RoomForm()
+def create_room(request, name):
+    if name == "room":
+        form = RoomForm()
+        if request.method == "POST":
+            form = RoomForm(request.POST)
+            if form.is_valid():
+                room = form.save(commit=False)
+                room.host = request.user
+                room.save()
+                return redirect("home")
+    else:
+        form = TopicForm()
+        if request.method == "POST":
+            form = TopicForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return redirect("home")
     
-    if request.method == "POST":
-        form = RoomForm(request.POST)
-        if form.is_valid():
-            room = form.save(commit=False)
-            room.host = request.user
-            room.save()
-            return redirect("home")
-    
-    context = {"form": form}
+    title = "room" if name == "room" else "topic"
+    context = {"form": form, "title": title}
     return render(request, "base/room_form.html", context)
 
 @login_required

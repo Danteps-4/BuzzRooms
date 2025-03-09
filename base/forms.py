@@ -1,12 +1,17 @@
 from django.contrib.auth.models import User
 from django import forms
 from django.forms import ModelForm
-from .models import Room, Profile
+from .models import Room, Profile, Topic
 
 class RoomForm(ModelForm):
     class Meta:
         model = Room
         fields = ["name", "topic", "description"]
+
+class TopicForm(ModelForm):
+    class Meta:
+        model = Topic
+        fields = ["name"]
 
 # class UserForm(ModelForm):
 #     class Meta:
